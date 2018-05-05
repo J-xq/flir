@@ -47,8 +47,9 @@ int send_command(int fd, unsigned char CODE, char *data, int ncmd)
     cmd[9 + ncmd] = (unsigned char)(crc & 0xff);
 
     write(fd, cmd, 10 + ncmd);
-    usleep(40000);
-    cnt = read(fd, cmd, 512);
+    usleep(20000);
+    cnt = read(fd, cmd, 300);
+    usleep(5000);
 
     switch (cmd[1]) {
     case 0:

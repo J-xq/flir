@@ -23,8 +23,8 @@
 
 int main(int argc, char *argv[])
 {
-    int fd, i, cnt;
-    unsigned char snapshot = 2;
+    int fd, i, ret;
+    unsigned char snapshot = 0;
     int bb;
 
     if (argc > 1) {
@@ -34,21 +34,18 @@ int main(int argc, char *argv[])
     }
     fd = serial_init(bb);
 
-    camera_reset(fd);
+    baud_rate(fd, 0x0007);
+    close(fd);
+    fd = serial_init(5);
 
-    factory_defaults(fd);
     camera_part(fd);
     camera_serial_no(fd);
-    return 0;
-    erase_flash(fd, snapshot);
-    sleep(1);
 
     digital_output_mode(fd, 0x0303);  /* 8bit bmp */
+    
+    transfer_frame(fd);
 
-    transfer_frame(fd, snapshot);
-    sleep(1);
-
-	read_picture(fd, snapshot);
+	read_picture(fd, 15);
 
     close(fd);
     return 0;

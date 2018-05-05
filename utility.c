@@ -19,15 +19,46 @@
 #include <stdio.h>
 #include "serial_flir.h"
 
+int get_memory_address(int fd, char snapshot)
+{
+    unsigned char cmd[128];
+    unsigned int addr;
+    int size;
+    int i;
+
+	cmd[0] = 0xff; cmd[1] = 0xff; cmd[2] = 0; cmd[3] = 0x13; // read snapshot n
+	send_command(fd, GET_MEMORY_ADDRESS, cmd, 4);
+
+    addr = (cmd[8] << 24) | (cmd[9] << 16) | (cmd[10] << 8) | cmd[11];
+    size = (cmd[12] << 24) | (cmd[13] << 16) | (cmd[14] << 8) | cmd[15];
+
+    printf("read snapshot: %08X %08X\n", addr, size);
+
+    return 0;
+}
+
+int get_memory_scale(int fd)
+{
+    unsigned char cmd[128];
+    int i;
+    cmd[0] = 0xff; cmd[1] = 0xff;
+    send_command(fd, GET_NV_MEMORY_SIZE, cmd, 2);
+    for(i = 0; i < 8; i++) {
+        printf("%02X ", cmd[i + 8]);
+    }
+    printf("\n");
+    return 0;
+}
+
 int baud_rate(int fd, int mode)
 {
     unsigned char cmd[128];
-    if (mode < 0) {
+    if (mode < 0) {   /* read baud rate */
         send_command(fd, BAUD_RATE, cmd, 0);
-    } else {
+    } else {         /* set baud rate */
         cmd[0] = mode >> 8;
         cmd[1] = mode;
-        send_command(fd, BAUD_RATE, cmd, 0);
+        send_command(fd, BAUD_RATE, cmd, 2);
     }
 
     printf("baud rate: %02X%02X\n", cmd[8], cmd[9]);
@@ -50,8 +81,8 @@ int camera_part(int fd)
 
     cnt = send_command(fd, CAMERA_PART, cmd, 0);
     printf("CAM_PART: ");
-    for(i = 0; i < cnt; i++)
-        printf("%02X ", cmd[i]);
+    for(i = 0; i < 32; i++)
+        printf("%c", cmd[i+8]);
     printf("\n");
     return 0;
 }
@@ -63,8 +94,8 @@ int camera_serial_no(int fd)
 
     cnt = send_command(fd, SERIAL_NUMBER, cmd, 0);
     printf("SERIAL No.: ");
-    for(i = 0; i < cnt; i++) {
-        printf("%02X ", cmd[i]);
+    for(i = 0; i < 8; i++) {
+        printf("%02X ", cmd[i+8]);
     }
     printf("\n");
     return 0;
@@ -80,11 +111,12 @@ int digital_output_mode(int fd, int mode)
     return 0;
 }
 
-int transfer_frame(int fd, int snapshot)
+/* Transfer a 8-bit BMP snapshot into the next available slot in the flash */
+int transfer_frame(int fd)
 {
     unsigned char cmd[128];
     
-    cmd[0] = 0x16; cmd[1] = snapshot; cmd[2] = 0x00; cmd[3] = 0x01;
+    cmd[0] = 0x16; cmd[1] = 0; cmd[2] = 0x00; cmd[3] = 0x01;
     send_command(fd, TRANSFER_FRAME, cmd, 4);
 
     return 0;

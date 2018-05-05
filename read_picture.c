@@ -39,6 +39,7 @@ int read_memory(int fd, unsigned char *cmd, unsigned int addr, int size)
         cmd[5] = size;
     }
     cnt = send_command(fd, READ_MEMORY, cmd, 6);
+
     //for(i = 0; i < cnt; i++)
     //    printf("%02X ", cmd[i]);
     //printf("%X\n", size);

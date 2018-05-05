@@ -54,10 +54,13 @@ int shutter_position(int fd, char mode);
 int camera_part(int fd);
 int camera_serial_no(int fd);
 int digital_output_mode(int fd, int mode);
-int transfer_frame(int fd, int snapshot);
+int transfer_frame(int fd);
 int baud_rate(int fd, int mode);
 int set_defaults(int fd);
 int camera_reset(int fd);
 int factory_defaults(int fd);
+int get_memory_scale(int fd);
+int get_memory_address(int fd, char snapshot);
 
+int erase_range(int fd, unsigned start, int blkcnt);
 #endif
