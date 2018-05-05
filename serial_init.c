@@ -30,6 +30,8 @@ speed_t bautratelist[] = {
 
 #define	DEV	"/dev/ttyUSB0"
 
+int fdserial = -1;
+
 int serial_init(int bb)
 {
     int fd;
@@ -61,5 +63,6 @@ int serial_init(int bb)
     newtio.c_cc[VMIN] = 1; /* blocking read until 0 character arrives */
 
     tcsetattr(fd, TCSANOW, &newtio);
+    fdserial = fd;
     return fd;
 }

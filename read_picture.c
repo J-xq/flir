@@ -23,29 +23,6 @@
 #include <unistd.h>
 #include "serial_flir.h"
 
-int read_memory(int fd, unsigned char *cmd, unsigned int addr, int size)
-{
-    int cnt;
-    cmd[0] = addr >> 24;
-    cmd[1] = addr >> 16;
-    cmd[2] = addr >> 8;
-    cmd[3] = addr;
-
-    if (size > 255) {
-        cmd[4] = 1;
-        cmd[5] = 0;     /* read 256 bytes  */
-    } else {
-        cmd[4] = 0;
-        cmd[5] = size;
-    }
-    cnt = send_command(fd, READ_MEMORY, cmd, 6);
-
-    //for(i = 0; i < cnt; i++)
-    //    printf("%02X ", cmd[i]);
-    //printf("%X\n", size);
-    return cnt;
-}
-
 int read_picture(int fd, char n)
 {
     unsigned char cmd[512];

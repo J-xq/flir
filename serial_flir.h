@@ -62,5 +62,10 @@ int factory_defaults(int fd);
 int get_memory_scale(int fd);
 int get_memory_address(int fd, char snapshot);
 
+int read_memory(int fd, unsigned char *cmd, unsigned int addr, int size);
+
 int erase_range(int fd, unsigned start, int blkcnt);
+
+int fb_init(char *);
+int task_init(void);
 #endif

@@ -33,7 +33,6 @@ int main(int argc, char *argv[])
         bb = 2;
     }
     fd = serial_init(bb);
-
     baud_rate(fd, 0x0007);
     close(fd);
     fd = serial_init(5);
@@ -41,7 +40,13 @@ int main(int argc, char *argv[])
     camera_part(fd);
     camera_serial_no(fd);
 
+    fb_init("/dev/fb0");
+    task_init();
     digital_output_mode(fd, 0x0303);  /* 8bit bmp */
+
+    while (1) {
+        ;
+    }
     
     transfer_frame(fd);
 
