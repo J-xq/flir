@@ -76,6 +76,8 @@ gint gtk_timer(GtkWidget *widget)
     int x, y, c1;
 	unsigned char *p = &flashmem[1078];
 	static int snapshot = -1;
+    char strtime[256];
+    time_t ticks;
 
     gc = gdk_gc_new (widget->window);
 
@@ -86,21 +88,22 @@ gint gtk_timer(GtkWidget *widget)
 			color.green = c1 << 8;
 			color.blue = c1 << 8;
 			gdk_gc_set_rgb_fg_color(gc ,&color);
-			gdk_draw_point(widget->window,
-                  gc, x, y);
+			gdk_draw_point(widget->window, gc, x, y);
 		}
 	}
 
-    font = gdk_font_load("lucidasans-bolditalic-14");
+    font = gdk_font_load("lucidasans-bold-14");
+    ticks = time(NULL);
+    sprintf((char *)strtime, "%.24s", ctime(&ticks));
 
     color.red = 0xffff;
-	color.green = 0;
+	color.green = 0xffff;
 	color.blue = 0;
     gdk_gc_set_rgb_fg_color(gc ,&color);
     gdk_draw_string (widget->window,
-            font,
-            gc,
-            20, 20, "hello");
+                     font,
+                     gc,
+                     20, 20, strtime);
 
 	snapshot++;
 	if (snapshot > 20) {
@@ -130,21 +133,19 @@ gboolean expose_callback(GtkWidget *widget, GdkEventExpose *e, gpointer data)
 			color.green = c1 << 8;
 			color.blue = c1 << 8;
 			gdk_gc_set_rgb_fg_color(gc ,&color);
-			gdk_draw_point(widget->window,
-                  gc, x, y);
+			gdk_draw_point(widget->window, gc, x, y);
 		}
 	}
 
-    font = gdk_font_load("lucidasans-bolditalic-14");
-
+    font = gdk_font_load("lucidasans-bold-14");
     color.red = 0xffff;
-	color.green = 0;
+	color.green = 0xffff;
 	color.blue = 0;
     gdk_gc_set_rgb_fg_color(gc ,&color);
     gdk_draw_string (widget->window,
             font,
             gc,
-            20, 20, "hello");
+            10, 20, "Refreshed");
 
     return TRUE;
 }
@@ -155,17 +156,17 @@ int read_picture(int fd, char n)
     int cnt, i;
     int picptr = 0;
 	unsigned int addr;
-	int size;
+	int size, savesize;
     int offset, width, height;
+    int pic;
 
-	int x, y;
-	for(y = 0; y < 512; y++) {
-		for(x = 0; x < 640; x++) {
-			flashmem[1078 + y*640+x] = rand();
-		}
-	}
-	return 0;
-
+	//int x, y;
+	//for(y = 0; y < 512; y++) {
+	//	for(x = 0; x < 640; x++) {
+	//		flashmem[1078 + y*640+x] = rand();
+	//	}
+	//}
+	//return 0;
 
 	cmd[0] = 0; cmd[1] = n; cmd[2] = 0; cmd[3] = 0x13; // read snapshot n
 	cnt = send_command(fd, GET_MEMORY_ADDRESS, cmd, 4);
@@ -173,8 +174,10 @@ int read_picture(int fd, char n)
     addr = (cmd[8] << 24) | (cmd[9] << 16) | (cmd[10] << 8) | cmd[11];
     size = (cmd[12] << 24) | (cmd[13] << 16) | (cmd[14] << 8) | cmd[15];
     
+    savesize = size;
     printf("snapshot addr: %08X %08X\n", addr, size);
     picptr = 0;
+
     while(size > 0) {
         read_memory(fd, cmd, addr, size);
 
@@ -186,7 +189,6 @@ int read_picture(int fd, char n)
         size -= 256;
         addr += 256;
         picptr += 256;
-        break;
     }
 
     offset = *(int *)(&flashmem[10]);
@@ -194,6 +196,10 @@ int read_picture(int fd, char n)
     height = *(int *)(&flashmem[22]);
 
     printf("%d %d %d\n", offset, width, height);
+
+    //pic = open("./picture", O_CREAT|O_RDWR, 0644);
+    //write(pic, flashmem, savesize);
+    //close(pic);
 
     //draw_picture(&flashmem[offset], width, height);
 

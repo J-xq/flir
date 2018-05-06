@@ -47,7 +47,6 @@
 int serial_init(int);
 int send_command(int fd, unsigned char CODE, char *data, int ncmd);
 int read_picture(int fd, char n);
-int erase_flash(int fd, char n);
 
 /* utility */
 int shutter_position(int fd, char mode);
@@ -60,10 +59,11 @@ int set_defaults(int fd);
 int camera_reset(int fd);
 int factory_defaults(int fd);
 int get_memory_scale(int fd);
-int get_memory_address(int fd, char snapshot);
+int get_memory_address(int fd, int state);
 
 int read_memory(int fd, unsigned char *cmd, unsigned int addr, int size);
 
+int erase_flash(int fd);
 int erase_range(int fd, unsigned start, int blkcnt);
 
 int fb_init(char *);

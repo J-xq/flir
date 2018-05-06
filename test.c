@@ -23,9 +23,11 @@
 
 int main(int argc, char *argv[])
 {
-    int fd, i, ret;
+    int fd, i, k, ret;
     unsigned char snapshot = 0;
     int bb;
+    unsigned char cmd[512];
+    unsigned int addr;
 
     if (argc > 1) {
         bb = atoi(argv[1]);
@@ -33,6 +35,9 @@ int main(int argc, char *argv[])
         bb = 2;
     }
     fd = serial_init(bb);
+    if (fd < 0) {
+        return -1;
+    }
     baud_rate(fd, 0x0007);
     close(fd);
     fd = serial_init(5);
@@ -40,17 +45,11 @@ int main(int argc, char *argv[])
     camera_part(fd);
     camera_serial_no(fd);
 
-    ret = fb_init("/dev/fb0");
-    digital_output_mode(fd, 0x0303);  /* 8bit bmp */
+    //digital_output_mode(fd, 0x0303);  /* 8bit bmp */
 
-    task_init(4);
-    while (1) {
-        ;
-    }
-    
+    task_init(3);
     //transfer_frame(fd);
-
-	//read_picture(fd, 15);
+	read_picture(fd, 2);
 
     close(fd);
     return 0;

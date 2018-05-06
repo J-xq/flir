@@ -17,16 +17,25 @@
  */
 
 #include <stdio.h>
+#include <unistd.h>
 #include "serial_flir.h"
 
-int get_memory_address(int fd, char snapshot)
+/* read memory state:
+ * FFFF: return total address
+ * FFFE: return used bytes and total number of snapshots in flash
+ * 00XX: return address and size(in bytes) of snapshot XX
+ * 80XX: return 4bytes head ('BMP8' or 'SNAP') of snapshot XX
+ */
+int get_memory_address(int fd, int state)
 {
     unsigned char cmd[128];
     unsigned int addr;
     int size;
     int i;
 
-	cmd[0] = 0xff; cmd[1] = 0xff; cmd[2] = 0; cmd[3] = 0x13; // read snapshot n
+	cmd[0] = state >> 8;
+    cmd[1] = state;
+    cmd[2] = 0; cmd[3] = 0x13;
 	send_command(fd, GET_MEMORY_ADDRESS, cmd, 4);
 
     addr = (cmd[8] << 24) | (cmd[9] << 16) | (cmd[10] << 8) | cmd[11];
@@ -171,7 +180,6 @@ int read_memory(int fd, unsigned char *cmd, unsigned int addr, int size)
         cmd[5] = size;
     }
     cnt = send_command(fd, READ_MEMORY, cmd, 6);
-
     //for(i = 0; i < cnt; i++)
     //    printf("%02X ", cmd[i]);
     //printf("%X\n", size);

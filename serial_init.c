@@ -41,7 +41,7 @@ int serial_init(int bb)
 //    fd = open(DEV, O_RDWR | O_NOCTTY | O_NDELAY|O_NONBLOCK);
     fd = open(DEV, O_RDWR);
     if(fd < 0){
-        printf("open error\n");
+        printf("open %s error\n", DEV);
         return -1;
     }
     br = bautratelist[bb];

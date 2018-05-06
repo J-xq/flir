@@ -21,18 +21,18 @@ int main(int argc, char *argv[]) {
     unsigned char snapshot = 0;
     int bb;
 
-    //if (argc > 1) {
-    //    bb = atoi(argv[1]);
-    //} else {
-    //    bb = 2;
-    //}
-    //fd = serial_init(bb);
-    //baud_rate(fd, 0x0007);
-    //close(fd);
-    //fd = serial_init(5);
+    if (argc > 1) {
+        bb = atoi(argv[1]);
+    } else {
+        bb = 2;
+    }
+    fd = serial_init(bb);
+    baud_rate(fd, 0x0007);
+    close(fd);
+    fd = serial_init(5);
 
-    //camera_part(fd);
-    //camera_serial_no(fd);
+    camera_part(fd);
+    camera_serial_no(fd);
 
     //ret = fb_init("/dev/fb0");
     //digital_output_mode(fd, 0x0303);  /* 8bit bmp */
@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
                       G_CALLBACK (expose_callback), NULL);
     gtk_widget_show_all(window);
 
-    tag = gtk_timeout_add(5000, gtk_timer, draw);
+    tag = gtk_timeout_add(120000, gtk_timer, draw);
 
     gtk_main();
 

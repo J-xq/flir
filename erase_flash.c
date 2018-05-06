@@ -16,7 +16,6 @@
  * ============================================================================
  */
 
-#include <string.h>
 #include <stdio.h>
 #include <unistd.h>
 #include "serial_flir.h"
@@ -25,8 +24,13 @@
 #define  BASEADDR   0x01000000
 #define  BLKSIZE    (1<<17)
 
-/* erase snapshot n. erase all when 0=0 */
-int erase_flash(int fd, char n)
+/* erase all flash
+ * MEMORY START at 0x02960000, with total length 0x660000
+ * first 4K used to save pic info
+ * BMP data begins at 0x02961000, each 0x50436byes (BMP8)
+ * byte-by-byte saved
+ */
+int erase_flash(int fd)
 {
     unsigned char cmd[512];
     int cnt, i;
@@ -34,13 +38,8 @@ int erase_flash(int fd, char n)
     unsigned int addr, blkaddr;
     int size, blkcnt;
 
-    memcpy(cmd, "\x00\x00\x00\x13", 4);
-    if (n >= 0) {
-        cmd[0] = 0;
-        cmd[1] = n;
-    } else {
-        return -1;
-    }
+    cmd[0] = 0xff; cmd[1] = 0xff;
+    cmd[2] = 0x00; cmd[3] = 0x13;
     /* 
      * FFFF0013: read base address and total size( 02960000 00660000 )
      * FFFE0013: return number of used bytes and total number of snapshots
