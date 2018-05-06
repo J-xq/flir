@@ -67,5 +67,5 @@ int read_memory(int fd, unsigned char *cmd, unsigned int addr, int size);
 int erase_range(int fd, unsigned start, int blkcnt);
 
 int fb_init(char *);
-int task_init(void);
+int task_init(int);
 #endif
