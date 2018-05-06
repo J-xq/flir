@@ -47,9 +47,13 @@ int main(int argc, char *argv[])
 
     //digital_output_mode(fd, 0x0303);  /* 8bit bmp */
 
-    task_init(3);
+    fb_init("/dev/fb0");
+
+    task_init(120);  // 120 seconds
     //transfer_frame(fd);
-	read_picture(fd, 2);
+    while (1) {
+        ;
+    }
 
     close(fd);
     return 0;

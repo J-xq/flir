@@ -46,7 +46,7 @@
 
 int serial_init(int);
 int send_command(int fd, unsigned char CODE, char *data, int ncmd);
-int read_picture(int fd, char n);
+int read_picture(int fd, char n, unsigned char *buf);
 
 /* utility */
 int shutter_position(int fd, char mode);

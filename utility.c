@@ -43,7 +43,7 @@ int get_memory_address(int fd, int state)
 
     printf("read snapshot: %08X %08X\n", addr, size);
 
-    return 0;
+    return size;
 }
 
 int get_memory_scale(int fd)
